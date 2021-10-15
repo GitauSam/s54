@@ -8,11 +8,25 @@ trait Utils
     {
         if ($n <= 2) return 1; 
 
-        return $this->fib($n-1) + $this->fib($n-2);
+        return $this->fib($n-1) + $this->fib($n-2);;
     }
 
-    public function generateFibonacciNumbers(): array 
-    { 
-        return array();
+    private function generateFibNumbers(): array
+    {
+        $count = 3;
+        $fibNos = [1];
+
+        while(true) 
+        {
+            $res = $this->fib($count);
+            if ($res > 1000) 
+            {
+                break;
+            }
+            array_push($fibNos, $res);
+            $count++;
+        }
+
+        return $fibNos;
     }
 }

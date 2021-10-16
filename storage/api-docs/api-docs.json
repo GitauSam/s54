@@ -14,12 +14,12 @@
     },
     "servers": [
         {
-            "url": "127.0.0.1:8000",
+            "url": "http://localhost:8000",
             "description": "S54 Lottery API Server"
         }
     ],
     "paths": {
-        "/lottery/{number}/{country}": {
+        "/api/lottery/{number}/{country}": {
             "get": {
                 "tags": [
                     "LotteryResults"
@@ -49,8 +49,50 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successful operation"
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LotteryResponse"
+                                }
+                            }
+                        }
                     }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "LotteryResponse": {
+                "title": "S54 Lottery",
+                "description": "Lottery Response model",
+                "properties": {
+                    "status": {
+                        "title": "status",
+                        "description": "status",
+                        "type": "string",
+                        "format": "string",
+                        "example": "0"
+                    },
+                    "message": {
+                        "title": "message",
+                        "description": "message",
+                        "type": "string",
+                        "format": "string",
+                        "example": "Congratulations ..."
+                    },
+                    "winning_numbers": {
+                        "title": "winning_numbers",
+                        "description": "winning numbers",
+                        "type": "string",
+                        "format": "array",
+                        "example": "[1, 2, 3]"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "LotteryResponse"
                 }
             }
         }

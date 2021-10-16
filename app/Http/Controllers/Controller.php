@@ -26,7 +26,7 @@ class Controller extends BaseController
      * )
      *
      * @OA\Server(
-     *      url="127.0.0.1:8000",
+     *      url="http://localhost:8000",
      *      description="S54 Lottery API Server"
      * )
 

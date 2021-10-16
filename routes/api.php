@@ -3,6 +3,7 @@
 use App\Http\Controllers\LotteryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use PragmaRX\Countries\Package\Services\Countries;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +22,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/lottery/{number}/{country}', [LotteryController::class, 'lottery']);
 
-Route::get('/test', function() {
-    // $countries = new Countries();
-    // $currency = $countries->whereNameCommon('Brazil')->pluck('currencies')[0][0];
-
-});

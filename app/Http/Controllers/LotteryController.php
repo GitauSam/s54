@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use PragmaRX\Countries\Package\Countries;
-use Gocanto\Converter\Examples\CurrenciesRepositoryExample;
-use Gocanto\Converter\Converter;
-use Gocanto\Converter\RoundedNumber;
+use App\Http\Resources\LotteryResource;
 use App\Traits\Utils;
+use App\Models\LotteryResponse;
 
 class LotteryController extends Controller
 {
@@ -16,7 +13,7 @@ class LotteryController extends Controller
 
     /**
      * @OA\Get(
-     *      path="/lottery/{number}/{country}",
+     *      path="/api/lottery/{number}/{country}",
      *      operationId="getLotteryResults",
      *      tags={"LotteryResults"},
      *      summary="Get lottery results",
@@ -42,37 +39,46 @@ class LotteryController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/LotteryResponse")
      *       ),
      *     )
      */
     public function lottery($number, $country)
     {
         try {
+            if ($number == null || $country == null || empty($number) || empty($country))
+                throw new \Exception("Invalid input details");
+
             $pool = $this->generateFibNumbers();
-            shuffle($pool);
+            
+            if (!shuffle($pool)) throw new \Exception("Could not shuffle pool");
+
             $winningPool = array_splice($pool, 0, 3);
 
+            $lotteryResponse = new LotteryResponse();
+            $lotteryResponse->status = "0";
+            $lotteryResponse->winning_numbers = $winningPool;
+
             if (in_array($number, $winningPool)) {
-                return response()
-                    ->json([
-                        "status" => "0",
-                        "message" => "Congratulations!",
-                        "winning_numbers" => json_encode($winningPool)
-                    ]);
+                $details = $this->getWinningAmount(ucfirst(strtolower($country)));
+
+                $lotteryResponse->message = "Congratulations! You have won " 
+                                                . $details["currency"] 
+                                                . " " 
+                                                . round($details["amount"], 2);
+
+                return new LotteryResource($lotteryResponse);
+
             } else {
-                return response()
-                    ->json([
-                        "status" => "0",
-                        "message" => "Tough luck! Try again next time.",
-                        "winning_numbers" => json_encode($winningPool)
-                    ]);
+                $lotteryResponse->message = "Tough luck! Try again next time";
+                
+                return new LotteryResource($lotteryResponse);
             }
         } catch (\Exception $e) {
-            return response()
-                ->json([
-                    "status" => "99",
-                    "message" => "Unable to process request. Error: " . $e->getMessage(),
-                ]);
+            $lotteryResponse = new LotteryResponse();
+            $lotteryResponse->status = "99";
+            $lotteryResponse->message = "Unable to process request. Error: " . $e->getMessage();
+            return new LotteryResource($lotteryResponse);
         }
     }
 }
